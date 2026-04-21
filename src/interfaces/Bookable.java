@@ -3,8 +3,8 @@ package interfaces;
 import models.Traveler;
 
 public interface Bookable {
-    void book(Traveler traveler) throws Exception;
-    void cancel(Traveler traveler) throws Exception;
+    void book() throws Exception;
+    void cancel() throws Exception;
     boolean isAvailable();
     double getPrice();
 }

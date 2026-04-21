@@ -17,64 +17,63 @@ public class App {
     private final BookingService bookingService = new BookingService();
     private final Scanner scanner = new Scanner(System.in);
 
+    private Traveler loggedInTraveler = null;
+
     public void start() {
         System.out.println("Welcome to Trip Planner!");
         boolean running = true;
         while (running) {
-            printMainMenu();
-            String input = scanner.nextLine().trim();
-            switch (input) {
-                case "1" -> handleTravelerMenu();
-                case "2" -> handleDestinationMenu();
-                case "3" -> handleTransportationMenu();
-                case "4" -> handleAccommodationMenu();
-                case "5" -> handleActivityMenu();
-                case "6" -> handleTripMenu();
-                case "7" -> handleBookingMenu();
-                case "0" -> {
-                    System.out.println("Goodbye!");
-                    running = false;
+            if (loggedInTraveler == null) {
+                printAuthMenu();
+                String input = scanner.nextLine().trim();
+                switch (input) {
+                    case "1" -> register();
+                    case "2" -> login();
+                    case "0" -> {
+                        System.out.println("Goodbye!");
+                        running = false;
+                    }
+                    default -> System.out.println("Invalid option. Please try again.");
                 }
-                default -> System.out.println("Invalid option. Please try again.");
+            } else {
+                printMainMenu();
+                String input = scanner.nextLine().trim();
+                switch (input) {
+                    case "1" -> handleTripMenu();
+                    case "2" -> handleBookingMenu();
+                    case "3" -> logout();
+                    case "0" -> {
+                        System.out.println("Goodbye!");
+                        running = false;
+                    }
+                    default -> System.out.println("Invalid option. Please try again.");
+                }
             }
         }
     }
 
-    // ==================== MENUS ====================
+    // ==================== AUTH ====================
 
-    private void printMainMenu() {
-        System.out.println("\n===== MAIN MENU =====");
-        System.out.println("1 - Manage Travelers");
-        System.out.println("2 - Manage Destinations");
-        System.out.println("3 - Manage Transportation");
-        System.out.println("4 - Manage Accommodation");
-        System.out.println("5 - Manage Activities");
-        System.out.println("6 - Manage Trips");
-        System.out.println("7 - Manage Bookings");
+    private void printAuthMenu() {
+        System.out.println("\n===== TRIP PLANNER =====");
+        System.out.println("1 - Register");
+        System.out.println("2 - Login");
         System.out.println("0 - Exit");
         System.out.print("Choose: ");
     }
 
-    // ==================== TRAVELER ====================
-
-    private void handleTravelerMenu() {
-        System.out.println("\n--- Traveler Menu ---");
-        System.out.println("1 - Add traveler");
-        System.out.println("2 - List all travelers");
-        System.out.println("3 - Find traveler by ID");
-        System.out.println("4 - Delete traveler");
+    private void printMainMenu() {
+        System.out.println("\n===== MAIN MENU =====");
+        System.out.println("Logged in as: " + loggedInTraveler.getFullName());
+        System.out.println("1 - Manage My Trips");
+        System.out.println("2 - Manage Bookings");
+        System.out.println("3 - Logout");
+        System.out.println("0 - Exit");
         System.out.print("Choose: ");
-        switch (scanner.nextLine().trim()) {
-            case "1" -> addTraveler();
-            case "2" -> listTravelers();
-            case "3" -> findTraveler();
-            case "4" -> deleteTraveler();
-            default -> System.out.println("Invalid option.");
-        }
     }
 
-    private void addTraveler() {
-        System.out.println("\n-- Add Traveler --");
+    private void register() {
+        System.out.println("\n-- Register --");
         System.out.print("First name: ");
         String firstName = scanner.nextLine().trim();
         System.out.print("Last name: ");
@@ -85,68 +84,137 @@ public class App {
         String phone = scanner.nextLine().trim();
         Traveler traveler = new Traveler(firstName, lastName, email, phone);
         travelerService.registerTraveler(traveler);
-        System.out.println("Traveler added: " + traveler);
+        System.out.println("Registered successfully! Please login.");
     }
 
-    private void listTravelers() {
-        List<Traveler> travelers = travelerService.getAllTravelers();
-        if (travelers.isEmpty()) {
-            System.out.println("No travelers registered.");
-            return;
-        }
-        System.out.println("\n-- All Travelers --");
-        for (Traveler t : travelers) System.out.println(t);
-    }
-
-    private void findTraveler() {
-        System.out.print("Enter traveler ID: ");
-        try {
-            int id = Integer.parseInt(scanner.nextLine().trim());
-            Traveler t = travelerService.findById(id);
-            if (t == null) System.out.println("Traveler not found.");
-            else System.out.println(t);
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid ID.");
+    private void login() {
+        System.out.print("\nEnter your email: ");
+        String email = scanner.nextLine().trim();
+        Traveler traveler = travelerService.findByEmail(email);
+        if (traveler == null) {
+            System.out.println("No account found with that email.");
+        } else {
+            loggedInTraveler = traveler;
+            System.out.println("Welcome back, " + loggedInTraveler.getFullName() + "!");
         }
     }
 
-    private void deleteTraveler() {
-        System.out.print("Enter traveler ID to delete: ");
-        try {
-            int id = Integer.parseInt(scanner.nextLine().trim());
-            travelerService.deleteTraveler(id);
-            System.out.println("Traveler deleted.");
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid ID.");
-        }
+    private void logout() {
+        System.out.println("Logged out. Goodbye, " + loggedInTraveler.getFullName() + "!");
+        loggedInTraveler = null;
     }
 
-    // ==================== DESTINATION ====================
+    // ==================== TRIP ====================
 
-    private void handleDestinationMenu() {
-        System.out.println("\n-- Add Destination --");
-        System.out.println("Note: destinations are added directly to trips.");
-        System.out.println("Go to Manage Trips to add a destination to a trip.");
-    }
-
-    // ==================== TRANSPORTATION ====================
-
-    private void handleTransportationMenu() {
-        System.out.println("\n--- Transportation Menu ---");
-        System.out.println("1 - Create flight");
-        System.out.println("2 - Create train");
-        System.out.println("3 - Create bus");
+    private void handleTripMenu() {
+        System.out.println("\n--- My Trips ---");
+        System.out.println("1 - Create trip");
+        System.out.println("2 - List my trips");
+        System.out.println("3 - View trip summary");
+        System.out.println("4 - Search trips by destination");
+        System.out.println("5 - Delete trip");
         System.out.print("Choose: ");
         switch (scanner.nextLine().trim()) {
-            case "1" -> createFlight();
-            case "2" -> createTrain();
-            case "3" -> createBus();
+            case "1" -> createTrip();
+            case "2" -> listMyTrips();
+            case "3" -> viewTripSummary();
+            case "4" -> searchTripsByDestination();
+            case "5" -> deleteTrip();
             default -> System.out.println("Invalid option.");
         }
     }
 
-    private void createFlight() {
-        System.out.println("\n-- Create Flight --");
+    private void createTrip() {
+        System.out.println("\n-- Create Trip --");
+        System.out.print("Trip name: ");
+        String name = scanner.nextLine().trim();
+        System.out.print("Start date (yyyy-mm-dd): ");
+        LocalDate startDate = parseDate();
+        System.out.print("End date (yyyy-mm-dd): ");
+        LocalDate endDate = parseDate();
+        System.out.print("Total budget (lei): ");
+        double budget = parseDouble();
+
+        Trip trip = new Trip.Builder(name)
+                .startDate(startDate)
+                .endDate(endDate)
+                .traveler(loggedInTraveler)
+                .budget(new Budget(budget))
+                .build();
+
+        tripService.createTrip(trip);
+        System.out.println("Trip created! ID: " + trip.getId());
+    }
+
+    private void listMyTrips() {
+        List<Trip> myTrips = tripService.getTripsForTraveler(loggedInTraveler);
+        if (myTrips.isEmpty()) {
+            System.out.println("You have no trips yet.");
+            return;
+        }
+        System.out.println("\n-- My Trips (sorted by start date) --");
+        for (Trip t : myTrips) System.out.println(t);
+    }
+
+    private void viewTripSummary() {
+        Trip trip = selectMyTrip();
+        if (trip == null) return;
+        try {
+            System.out.println(tripService.generateSummary(trip.getId()));
+        } catch (TripNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void searchTripsByDestination() {
+        System.out.print("Enter city name: ");
+        String city = scanner.nextLine().trim();
+        List<Trip> results = tripService.searchByDestination(city);
+        if (results.isEmpty()) System.out.println("No trips found for: " + city);
+        else results.forEach(System.out::println);
+    }
+
+    private void deleteTrip() {
+        Trip trip = selectMyTrip();
+        if (trip == null) return;
+        try {
+            tripService.deleteTrip(trip.getId());
+            System.out.println("Trip deleted.");
+        } catch (TripNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // ==================== BOOKING ====================
+
+    private void handleBookingMenu() {
+        Trip trip = selectMyTrip();
+        if (trip == null) return;
+
+        System.out.println("\n--- Bookings for: " + trip.getName() + " ---");
+        System.out.println("1 - Book a flight");
+        System.out.println("2 - Book a train");
+        System.out.println("3 - Book a bus");
+        System.out.println("4 - Book an accommodation");
+        System.out.println("5 - Book an activity");
+        System.out.println("6 - View bookings for this trip");
+        System.out.println("7 - Cancel a booking");
+        System.out.print("Choose: ");
+
+        switch (scanner.nextLine().trim()) {
+            case "1" -> bookFlight(trip);
+            case "2" -> bookTrain(trip);
+            case "3" -> bookBus(trip);
+            case "4" -> bookAccommodation(trip);
+            case "5" -> bookActivity(trip);
+            case "6" -> listBookingsForTrip(trip);
+            case "7" -> cancelBooking();
+            default -> System.out.println("Invalid option.");
+        }
+    }
+
+    private void bookFlight(Trip trip) {
+        System.out.println("\n-- Book a Flight --");
         System.out.print("Provider (airline name): ");
         String provider = scanner.nextLine().trim();
         System.out.print("Origin: ");
@@ -174,12 +242,17 @@ public class App {
                 .airlineClass(airlineClass)
                 .build();
 
-        System.out.println("Flight created: " + flight);
-        System.out.println("Flight ID: " + flight.getId() + " (use this to add it to a trip)");
+        try {
+            trip.addTransportation(flight);
+            Booking booking = bookingService.createBooking(trip, flight);
+            System.out.println("Flight booked successfully: " + booking);
+        } catch (BookingException e) {
+            System.out.println("Booking error: " + e.getMessage());
+        }
     }
 
-    private void createTrain() {
-        System.out.println("\n-- Create Train --");
+    private void bookTrain(Trip trip) {
+        System.out.println("\n-- Book a Train --");
         System.out.print("Provider: ");
         String provider = scanner.nextLine().trim();
         System.out.print("Origin: ");
@@ -207,12 +280,17 @@ public class App {
                 .wagonNumber(wagonNumber)
                 .build();
 
-        System.out.println("Train created: " + train);
-        System.out.println("Train ID: " + train.getId() + " (use this to add it to a trip)");
+        try {
+            trip.addTransportation(train);
+            Booking booking = bookingService.createBooking(trip, train);
+            System.out.println("Train booked successfully: " + booking);
+        } catch (BookingException e) {
+            System.out.println("Booking error: " + e.getMessage());
+        }
     }
 
-    private void createBus() {
-        System.out.println("\n-- Create Bus --");
+    private void bookBus(Trip trip) {
+        System.out.println("\n-- Book a Bus --");
         System.out.print("Provider: ");
         String provider = scanner.nextLine().trim();
         System.out.print("Origin: ");
@@ -237,14 +315,17 @@ public class App {
                 .busNumber(busNumber)
                 .build();
 
-        System.out.println("Bus created: " + bus);
-        System.out.println("Bus ID: " + bus.getId() + " (use this to add it to a trip)");
+        try {
+            trip.addTransportation(bus);
+            Booking booking = bookingService.createBooking(trip, bus);
+            System.out.println("Bus booked successfully: " + booking);
+        } catch (BookingException e) {
+            System.out.println("Booking error: " + e.getMessage());
+        }
     }
 
-    // ==================== ACCOMMODATION ====================
-
-    private void handleAccommodationMenu() {
-        System.out.println("\n-- Create Accommodation --");
+    private void bookAccommodation(Trip trip) {
+        System.out.println("\n-- Book an Accommodation --");
         System.out.print("Name: ");
         String name = scanner.nextLine().trim();
         System.out.print("Type (hotel/hostel/airbnb): ");
@@ -265,14 +346,17 @@ public class App {
                 .numberOfNights(nights)
                 .build();
 
-        System.out.println("Accommodation created: " + accommodation);
-        System.out.println("Accommodation ID: " + accommodation.getId() + " (use this to add it to a trip)");
+        try {
+            trip.setAccommodation(accommodation);
+            Booking booking = bookingService.createBooking(trip, accommodation);
+            System.out.println("Accommodation booked successfully: " + booking);
+        } catch (BookingException e) {
+            System.out.println("Booking error: " + e.getMessage());
+        }
     }
 
-    // ==================== ACTIVITY ====================
-
-    private void handleActivityMenu() {
-        System.out.println("\n-- Create Activity --");
+    private void bookActivity(Trip trip) {
+        System.out.println("\n-- Book an Activity --");
         System.out.print("Name: ");
         String name = scanner.nextLine().trim();
         System.out.print("City: ");
@@ -290,136 +374,22 @@ public class App {
                 .maxParticipants(maxParticipants)
                 .build();
 
-        System.out.println("Activity created: " + activity);
-        System.out.println("Activity ID: " + activity.getId() + " (use this to add it to a trip)");
-    }
-
-    // ==================== TRIP ====================
-
-    private void handleTripMenu() {
-        System.out.println("\n--- Trip Menu ---");
-        System.out.println("1 - Create trip");
-        System.out.println("2 - List all trips");
-        System.out.println("3 - View trip summary");
-        System.out.println("4 - Add traveler to trip");
-        System.out.println("5 - Search trips by destination");
-        System.out.println("6 - Delete trip");
-        System.out.print("Choose: ");
-        switch (scanner.nextLine().trim()) {
-            case "1" -> createTrip();
-            case "2" -> listTrips();
-            case "3" -> viewTripSummary();
-            case "4" -> addTravelerToTrip();
-            case "5" -> searchTripsByDestination();
-            case "6" -> deleteTrip();
-            default -> System.out.println("Invalid option.");
-        }
-    }
-
-    private void createTrip() {
-        System.out.println("\n-- Create Trip --");
-        System.out.print("Trip name: ");
-        String name = scanner.nextLine().trim();
-        System.out.print("Start date (yyyy-mm-dd): ");
-        LocalDate startDate = parseDate();
-        System.out.print("End date (yyyy-mm-dd): ");
-        LocalDate endDate = parseDate();
-        System.out.print("Total budget (lei): ");
-        double budget = parseDouble();
-
-        Trip trip = new Trip.Builder(name)
-                .startDate(startDate)
-                .endDate(endDate)
-                .budget(new Budget(budget))
-                .build();
-
-        tripService.createTrip(trip);
-        System.out.println("Trip created! ID: " + trip.getId());
-    }
-
-    private void listTrips() {
-        if (tripService.getAllTrips().isEmpty()) {
-            System.out.println("No trips found.");
-            return;
-        }
-        System.out.println("\n-- All Trips (sorted by start date) --");
-        for (Trip t : tripService.getAllTrips()) System.out.println(t);
-    }
-
-    private void viewTripSummary() {
-        System.out.print("Enter trip ID: ");
         try {
-            int id = Integer.parseInt(scanner.nextLine().trim());
-            System.out.println(tripService.generateSummary(id));
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid ID.");
-        } catch (TripNotFoundException e) {
-            System.out.println(e.getMessage());
+            trip.addActivity(activity);
+            Booking booking = bookingService.createBooking(trip, activity);
+            System.out.println("Activity booked successfully: " + booking);
+        } catch (BookingException e) {
+            System.out.println("Booking error: " + e.getMessage());
         }
     }
 
-    private void addTravelerToTrip() {
-        System.out.print("Trip ID: ");
-        try {
-            int tripId = Integer.parseInt(scanner.nextLine().trim());
-            System.out.print("Traveler ID: ");
-            int travelerId = Integer.parseInt(scanner.nextLine().trim());
-            Traveler traveler = travelerService.findById(travelerId);
-            if (traveler == null) {
-                System.out.println("Traveler not found.");
-                return;
-            }
-            tripService.addTraveler(tripId, traveler);
-            System.out.println("Traveler added to trip.");
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid ID.");
-        } catch (TripNotFoundException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    private void searchTripsByDestination() {
-        System.out.print("Enter city name: ");
-        String city = scanner.nextLine().trim();
-        List<Trip> results = tripService.searchByDestination(city);
-        if (results.isEmpty()) System.out.println("No trips found for: " + city);
-        else results.forEach(System.out::println);
-    }
-
-    private void deleteTrip() {
-        System.out.print("Enter trip ID to delete: ");
-        try {
-            int id = Integer.parseInt(scanner.nextLine().trim());
-            tripService.deleteTrip(id);
-            System.out.println("Trip deleted.");
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid ID.");
-        } catch (TripNotFoundException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    // ==================== BOOKING ====================
-
-    private void handleBookingMenu() {
-        System.out.println("\n--- Booking Menu ---");
-        System.out.println("1 - List all bookings");
-        System.out.println("2 - Cancel booking");
-        System.out.print("Choose: ");
-        switch (scanner.nextLine().trim()) {
-            case "1" -> listBookings();
-            case "2" -> cancelBooking();
-            default -> System.out.println("Invalid option.");
-        }
-    }
-
-    private void listBookings() {
-        List<Booking> bookings = bookingService.getAllBookings();
+    private void listBookingsForTrip(Trip trip) {
+        List<Booking> bookings = bookingService.getBookingsForTrip(trip);
         if (bookings.isEmpty()) {
-            System.out.println("No bookings found.");
+            System.out.println("No bookings for this trip.");
             return;
         }
-        System.out.println("\n-- All Bookings --");
+        System.out.println("\n-- Bookings for " + trip.getName() + " --");
         for (Booking b : bookings) System.out.println(b);
     }
 
@@ -437,6 +407,29 @@ public class App {
     }
 
     // ==================== HELPERS ====================
+
+    private Trip selectMyTrip() {
+        List<Trip> myTrips = tripService.getTripsForTraveler(loggedInTraveler);
+        if (myTrips.isEmpty()) {
+            System.out.println("You have no trips yet. Create one first.");
+            return null;
+        }
+        System.out.println("\nYour trips:");
+        for (Trip t : myTrips) System.out.println(t);
+        System.out.print("Enter trip ID: ");
+        try {
+            int id = Integer.parseInt(scanner.nextLine().trim());
+            Trip trip = myTrips.stream()
+                    .filter(t -> t.getId() == id)
+                    .findFirst()
+                    .orElse(null);
+            if (trip == null) System.out.println("Trip not found.");
+            return trip;
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid ID.");
+            return null;
+        }
+    }
 
     private double parseDouble() {
         while (true) {

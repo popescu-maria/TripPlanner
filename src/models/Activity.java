@@ -40,13 +40,13 @@ public class Activity implements Bookable {
     public int getId() { return this.id; }
 
     @Override
-    public void book(Traveler traveler) throws Exception {
+    public void book() throws Exception {
         if (!isAvailable()) throw new Exception("Activity is fully booked.");
         currentParticipants++;
     }
 
     @Override
-    public void cancel(Traveler traveler) throws Exception {
+    public void cancel() throws Exception {
         if (currentParticipants > 0) currentParticipants--;
     }
 

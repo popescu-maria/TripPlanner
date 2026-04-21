@@ -2,7 +2,7 @@ package service;
 
 import exceptions.TripNotFoundException;
 import models.*;
-import models.transportation.*;
+import models.transportation.Transportation;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,17 +28,22 @@ public class TripService {
         return trips;
     }
 
+    public List<Trip> getTripsForTraveler(Traveler traveler) {
+        List<Trip> result = new ArrayList<>();
+        for (Trip t : trips) {
+            if (t.getTraveler().getId() == traveler.getId()) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
+
     public void updateTripDates(int id, LocalDate startDate, LocalDate endDate) throws TripNotFoundException {
         Trip trip = findById(id);
         trips.remove(trip);
         trip.setStartDate(startDate);
         trip.setEndDate(endDate);
         trips.add(trip);
-    }
-
-    public void updateTripName(int id, String name) throws TripNotFoundException {
-        Trip trip = findById(id);
-        trip.setName(name);
     }
 
     public void deleteTrip(int id) throws TripNotFoundException {
@@ -74,16 +79,6 @@ public class TripService {
     public void removeActivity(int tripId, Activity activity) throws TripNotFoundException {
         Trip trip = findById(tripId);
         trip.removeActivity(activity);
-    }
-
-    public void addTraveler(int tripId, Traveler traveler) throws TripNotFoundException {
-        Trip trip = findById(tripId);
-        trip.addTraveler(traveler);
-    }
-
-    public void removeTraveler(int tripId, Traveler traveler) throws TripNotFoundException {
-        Trip trip = findById(tripId);
-        trip.removeTraveler(traveler);
     }
 
     public List<Trip> searchByDestination(String city) {
@@ -123,7 +118,6 @@ public class TripService {
         sb.append("Transportations: ").append(trip.getTransportations()).append("\n");
         sb.append("Accommodation: ").append(trip.getAccommodation()).append("\n");
         sb.append("Activities: ").append(trip.getActivities()).append("\n");
-        sb.append("Travelers: ").append(trip.getTravelers()).append("\n");
         sb.append("Total Cost: ").append(trip.calculateTotalCost()).append(" lei\n");
         if (trip.getBudget() != null) {
             sb.append("Budget: ").append(trip.getBudget()).append("\n");

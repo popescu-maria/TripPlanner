@@ -8,15 +8,15 @@ public class Booking {
 
     private static int counter = 0;
     private int bookingId;
-    private Traveler traveler;
+    private Trip trip;
     private Bookable bookable;
     private LocalDateTime bookingDate;
     private Status status;
     private double totalPrice;
 
-    public Booking(Traveler traveler, Bookable bookable) {
+    public Booking(Trip trip, Bookable bookable) {
         this.bookingId = ++counter;
-        this.traveler = traveler;
+        this.trip = trip;
         this.bookable = bookable;
         this.bookingDate = LocalDateTime.now();
         this.status = Status.PENDING;
@@ -26,14 +26,14 @@ public class Booking {
     public int getBookingId() { return this.bookingId; }
     public Status getStatus() { return this.status; }
     public Bookable getBookable() { return this.bookable; }
-    public Traveler getTraveler() { return this.traveler; }
-
+    public Trip getTrip() { return this.trip; }
+    public double getTotalPrice() { return this.totalPrice; }
 
     public void confirm() { this.status = Status.CONFIRMED; }
     public void cancel() { this.status = Status.CANCELLED; }
 
     @Override
     public String toString() {
-        return "Booking[" + bookingId + "] | " + traveler.getFullName() + " | " + status + " | " + totalPrice + " lei";
+        return "Booking[" + bookingId + "] | Trip: " + trip.getName() + " | " + status + " | " + totalPrice + " lei";
     }
 }

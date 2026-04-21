@@ -3,7 +3,7 @@ package service;
 import exceptions.BookingException;
 import interfaces.Bookable;
 import models.Booking;
-import models.Traveler;
+import models.Trip;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,18 +13,23 @@ import java.util.Map;
 public class BookingService {
     private Map<Integer, Booking> bookings = new HashMap<>();
 
-    public Booking createBooking(Traveler traveler, Bookable bookable) throws BookingException {
+    public Booking createBooking(Trip trip, Bookable bookable) throws BookingException {
         if (!bookable.isAvailable()) {
             throw new BookingException("The item you are trying to book is not available.");
         }
         try {
-            bookable.book(traveler);
+            bookable.book();
         } catch (Exception e) {
             throw new BookingException(e.getMessage());
         }
-        Booking booking = new Booking(traveler, bookable);
+        Booking booking = new Booking(trip, bookable);
         booking.confirm();
         bookings.put(booking.getBookingId(), booking);
+
+        if (trip.getBudget() != null) {
+            trip.getBudget().addExpense(bookable.getPrice());
+        }
+
         return booking;
     }
 
@@ -37,11 +42,15 @@ public class BookingService {
             throw new BookingException("Booking is already cancelled.");
         }
         try {
-            booking.getBookable().cancel(booking.getTraveler());
+            booking.getBookable().cancel();
         } catch (Exception e) {
             throw new BookingException(e.getMessage());
         }
         booking.cancel();
+
+        if (booking.getTrip().getBudget() != null) {
+            booking.getTrip().getBudget().addExpense(-booking.getTotalPrice());
+        }
     }
 
     public Booking findById(int bookingId) throws BookingException {
@@ -56,10 +65,10 @@ public class BookingService {
         return new ArrayList<>(bookings.values());
     }
 
-    public List<Booking> getBookingsForTraveler(Traveler traveler) {
+    public List<Booking> getBookingsForTrip(Trip trip) {
         List<Booking> result = new ArrayList<>();
         for (Booking b : bookings.values()) {
-            if (b.getTraveler().getId() == traveler.getId()) {
+            if (b.getTrip().getId() == trip.getId()) {
                 result.add(b);
             }
         }

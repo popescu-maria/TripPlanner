@@ -44,13 +44,13 @@ public class Accommodation implements Bookable {
     public int getId() { return this.id; }
 
     @Override
-    public void book(Traveler traveler) throws Exception {
+    public void book() throws Exception {
         if (!available) throw new Exception("Accommodation not available.");
         available = false;
     }
 
     @Override
-    public void cancel(Traveler traveler) throws Exception { available = true; }
+    public void cancel() throws Exception { available = true; }
 
     @Override
     public boolean isAvailable() { return available; }
