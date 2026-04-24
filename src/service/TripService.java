@@ -51,36 +51,6 @@ public class TripService {
         trips.remove(trip);
     }
 
-    public void addDestination(int tripId, Destination destination) throws TripNotFoundException {
-        Trip trip = findById(tripId);
-        trip.getDestinations().add(destination);
-    }
-
-    public void addTransportation(int tripId, Transportation transportation) throws TripNotFoundException {
-        Trip trip = findById(tripId);
-        trip.addTransportation(transportation);
-    }
-
-    public void removeTransportation(int tripId, Transportation transportation) throws TripNotFoundException {
-        Trip trip = findById(tripId);
-        trip.removeTransportation(transportation);
-    }
-
-    public void setAccommodation(int tripId, Accommodation accommodation) throws TripNotFoundException {
-        Trip trip = findById(tripId);
-        trip.setAccommodation(accommodation);
-    }
-
-    public void addActivity(int tripId, Activity activity) throws TripNotFoundException {
-        Trip trip = findById(tripId);
-        trip.addActivity(activity);
-    }
-
-    public void removeActivity(int tripId, Activity activity) throws TripNotFoundException {
-        Trip trip = findById(tripId);
-        trip.removeActivity(activity);
-    }
-
     public List<Trip> searchByDestination(String city) {
         List<Trip> result = new ArrayList<>();
         for (Trip t : trips) {

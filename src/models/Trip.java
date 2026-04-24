@@ -45,9 +45,6 @@ public class Trip implements Comparable<Trip> {
         public Builder startDate(LocalDate startDate) { this.startDate = startDate; return this; }
         public Builder endDate(LocalDate endDate) { this.endDate = endDate; return this; }
         public Builder traveler(Traveler traveler) { this.traveler = traveler; return this; }
-        public Builder destination(Destination destination) { this.destinations.add(destination); return this; }
-        public Builder transportation(Transportation transportation) { this.transportations.add(transportation); return this; }
-        public Builder accommodation(Accommodation accommodation) { this.accommodation = accommodation; return this; }
         public Builder budget(Budget budget) { this.budget = budget; return this; }
         public Trip build() { return new Trip(this); }
     }
@@ -75,11 +72,9 @@ public class Trip implements Comparable<Trip> {
     public Accommodation getAccommodation() { return this.accommodation; }
     public List<Activity> getActivities() { return this.activities; }
     public Budget getBudget() { return this.budget; }
-    public void setName(String name) { this.name = name; }
     public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
     public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
     public void setAccommodation(Accommodation accommodation) { this.accommodation = accommodation; }
-    public void setBudget(Budget budget) { this.budget = budget; }
 
     @Override
     public int compareTo(Trip other) {

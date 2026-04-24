@@ -1,3 +1,6 @@
+// This is just to test some of the actions. (create a trip, see it's details,
+// book a booking for that trip, calculate the budget based on that etc.)
+
 package app;
 
 import exceptions.BookingException;
