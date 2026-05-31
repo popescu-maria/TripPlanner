@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,10 @@ public class TripDAO implements GenericDAO<Trip> {
 
     private final TravelerDAO travelerDAO = new TravelerDAO();
     private final BudgetDAO budgetDAO = new BudgetDAO();
+    private final TransportationDAO transportationDAO = new TransportationDAO();
+    private final AccommodationDAO accommodationDAO = new AccommodationDAO();
+    private final ActivityDAO activityDAO = new ActivityDAO();
+    private final DestinationDAO destinationDAO = new DestinationDAO();
 
     private Trip mapRow(ResultSet rs) throws SQLException {
         int travelerId = rs.getInt("traveler_id");
@@ -40,7 +45,64 @@ public class TripDAO implements GenericDAO<Trip> {
                 .build();
 
         trip.setId(rs.getInt("id"));
+
+        loadRelated(trip, trip.getId());
+
         return trip;
+    }
+
+    private void loadRelated(Trip trip, int tripId) {
+        String tSql = "SELECT id FROM transportation WHERE trip_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(tSql)) {
+            ps.setInt(1, tripId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    var item = transportationDAO.findById(rs.getInt("id"));
+                    if (item != null) trip.addTransportation(item);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to load transportations: " + e.getMessage());
+        }
+
+        String aSql = "SELECT id FROM activity WHERE trip_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(aSql)) {
+            ps.setInt(1, tripId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    var item = activityDAO.findById(rs.getInt("id"));
+                    if (item != null) trip.addActivity(item);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to load activities: " + e.getMessage());
+        }
+
+        String acSql = "SELECT id FROM accommodation WHERE trip_id = ? ORDER BY id DESC LIMIT 1";
+        try (PreparedStatement ps = connection.prepareStatement(acSql)) {
+            ps.setInt(1, tripId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    var item = accommodationDAO.findById(rs.getInt("id"));
+                    if (item != null) trip.setAccommodation(item);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to load accommodation: " + e.getMessage());
+        }
+
+        String dSql = "SELECT destination_id FROM trip_destination WHERE trip_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(dSql)) {
+            ps.setInt(1, tripId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    var d = destinationDAO.findById(rs.getInt("destination_id"));
+                    if (d != null) trip.getDestinations().add(d);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to load destinations: " + e.getMessage());
+        }
     }
 
     @Override
@@ -70,6 +132,15 @@ public class TripDAO implements GenericDAO<Trip> {
             try (ResultSet keys = ps.getGeneratedKeys()) {
                 if (keys.next()) {
                     trip.setId(keys.getInt(1));
+                }
+            }
+
+            if (trip.getDestinations() != null) {
+                for (var d : trip.getDestinations()) {
+                    if (d.getId() == 0 || destinationDAO.findById(d.getId()) == null) {
+                        destinationDAO.save(d);
+                    }
+                    linkDestination(trip.getId(), d.getId());
                 }
             }
             return trip;
@@ -157,4 +228,17 @@ public class TripDAO implements GenericDAO<Trip> {
             throw new DataAccessException("Failed to find trips by traveler: " + e.getMessage());
         }
     }
+
+    public void linkDestination(int tripId, int destinationId) {
+        String sql = "INSERT INTO trip_destination (trip_id, destination_id) VALUES (?, ?) " +
+                "ON CONFLICT DO NOTHING";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, tripId);
+            ps.setInt(2, destinationId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to link destination: " + e.getMessage());
+        }
+    }
+
 }

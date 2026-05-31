@@ -1,5 +1,6 @@
 package services;
 
+import audit.AuditService;
 import dao.AccommodationDAO;
 import dao.ActivityDAO;
 import dao.BookingDAO;
@@ -23,6 +24,7 @@ public class BookingService {
     private final AccommodationDAO accommodationDAO = new AccommodationDAO();
     private final ActivityDAO activityDAO = new ActivityDAO();
     private final TransportationDAO transportationDAO = new TransportationDAO();
+    private final AuditService audit = AuditService.getInstance();
 
     private final Map<Integer, Booking> bookings = new HashMap<>();
 
@@ -33,6 +35,27 @@ public class BookingService {
             activityDAO.update(a);
         } else if (bookable instanceof Transportation t) {
             transportationDAO.update(t);
+        }
+    }
+
+    private void linkBookableToTrip(Trip trip, Bookable bookable) {
+        if (trip == null) return;
+        if (bookable instanceof Accommodation a) {
+            accommodationDAO.setTripId(a.getId(), trip.getId());
+        } else if (bookable instanceof Activity a) {
+            activityDAO.setTripId(a.getId(), trip.getId());
+        } else if (bookable instanceof Transportation t) {
+            transportationDAO.setTripId(t.getId(), trip.getId());
+        }
+    }
+
+    private void unlinkBookableFromTrip(Bookable bookable) {
+        if (bookable instanceof Accommodation a) {
+            accommodationDAO.clearTripId(a.getId());
+        } else if (bookable instanceof Activity a) {
+            activityDAO.clearTripId(a.getId());
+        } else if (bookable instanceof Transportation t) {
+            transportationDAO.clearTripId(t.getId());
         }
     }
 
@@ -48,8 +71,9 @@ public class BookingService {
 
         Booking booking = new Booking(trip, bookable);
         booking.confirm();
-        bookingDAO.save(booking);
-        persistBookableState(bookable);
+        bookingDAO.save(booking);            // persist the booking
+        persistBookableState(bookable);      // persist availability/participants change
+        linkBookableToTrip(trip, bookable);  // set the item's trip_id so it shows in the trip
 
         if (trip.getBudget() != null) {
             trip.getBudget().addExpense(bookable.getPrice());
@@ -57,6 +81,7 @@ public class BookingService {
         }
 
         bookings.put(booking.getBookingId(), booking);
+        audit.log("CREATE_BOOKING");
         return booking;
     }
 
@@ -76,6 +101,7 @@ public class BookingService {
         booking.cancel();
         bookingDAO.update(booking);
         persistBookableState(booking.getBookable());
+        unlinkBookableFromTrip(booking.getBookable());
 
         if (booking.getTrip() != null && booking.getTrip().getBudget() != null) {
             booking.getTrip().getBudget().addExpense(-booking.getTotalPrice());
@@ -83,6 +109,7 @@ public class BookingService {
         }
 
         bookings.put(booking.getBookingId(), booking);
+        audit.log("CANCEL_BOOKING");
     }
 
     public Booking findById(int bookingId) {

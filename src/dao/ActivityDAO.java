@@ -132,4 +132,26 @@ public class ActivityDAO implements GenericDAO<Activity> {
             throw new DataAccessException("Failed to delete activity: " + e.getMessage());
         }
     }
+
+    public void setTripId(int itemId, int tripId) {
+        String sql = "UPDATE activity SET trip_id = ? WHERE id = ?";
+        try (java.sql.PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, tripId);
+            ps.setInt(2, itemId);
+            ps.executeUpdate();
+        } catch (java.sql.SQLException e) {
+            throw new exceptions.DataAccessException("Failed to set trip_id: " + e.getMessage());
+        }
+    }
+
+    public void clearTripId(int itemId) {
+        String sql = "UPDATE activity SET trip_id = NULL WHERE id = ?";
+        try (java.sql.PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, itemId);
+            ps.executeUpdate();
+        } catch (java.sql.SQLException e) {
+            throw new exceptions.DataAccessException("Failed to clear trip_id: " + e.getMessage());
+        }
+    }
+
 }
