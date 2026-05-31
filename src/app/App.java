@@ -7,7 +7,7 @@ import exceptions.BookingException;
 import exceptions.TripNotFoundException;
 import models.*;
 import models.transportation.*;
-import service.*;
+import services.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -409,7 +409,6 @@ public class App {
         }
     }
 
-    // ==================== HELPERS ====================
 
     private Trip selectMyTrip() {
         List<Trip> myTrips = tripService.getTripsForTraveler(loggedInTraveler);

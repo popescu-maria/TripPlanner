@@ -42,6 +42,14 @@ public class Accommodation implements Bookable {
     }
 
     public int getId() { return this.id; }
+    public String getName() { return this.name; }
+    public String getType() { return this.type; }
+    public Destination getDestination() { return this.destination; }
+    public double getPricePerNight() { return this.pricePerNight; }
+    public int getNumberOfNights() { return this.numberOfNights; }
+
+    public void setId(int id) { this.id = id; }
+    public void setAvailable(boolean available) { this.available = available; }
 
     @Override
     public void book() throws Exception {

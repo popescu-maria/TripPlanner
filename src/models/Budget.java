@@ -16,6 +16,13 @@ public class Budget {
     public double getRemainingBudget() { return totalBudget - spentAmount; }
     public boolean isOverBudget() { return spentAmount > totalBudget; }
 
+    public int getId() { return this.id; }
+    public double getTotalBudget() { return this.totalBudget; }
+    public double getSpentAmount() { return this.spentAmount; }
+
+    public void setId(int id) { this.id = id; }
+    public void setSpentAmount(double spentAmount) { this.spentAmount = spentAmount; }
+
     @Override
     public String toString() {
         return "Budget: " + totalBudget + " lei | Spent: " + spentAmount + " lei | Remaining: " + getRemainingBudget() + " lei";

@@ -1,6 +1,7 @@
 package models;
 
 public class Destination {
+    private int id;
     private String city;
     private String country;
 
@@ -10,6 +11,10 @@ public class Destination {
     }
 
     public String getCity() { return this.city; }
+    public String getCountry() { return this.country; }
+    public int getId() { return this.id; }
+
+    public void setId(int id) { this.id = id; }
 
     @Override
     public String toString() {

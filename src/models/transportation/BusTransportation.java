@@ -21,6 +21,8 @@ public class BusTransportation extends Transportation{
         public BusTransportation build() { return new BusTransportation(this); }
     }
 
+    public String getBusNumber() { return this.busNumber; }
+
     @Override
     public String getTransportationType() { return "Bus"; }
 

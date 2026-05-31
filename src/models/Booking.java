@@ -28,9 +28,14 @@ public class Booking {
     public Bookable getBookable() { return this.bookable; }
     public Trip getTrip() { return this.trip; }
     public double getTotalPrice() { return this.totalPrice; }
+    public LocalDateTime getBookingDate() { return this.bookingDate; }
 
     public void confirm() { this.status = Status.CONFIRMED; }
     public void cancel() { this.status = Status.CANCELLED; }
+    public void setBookingId(int bookingId) { this.bookingId = bookingId; }
+    public void setStatus(Status status) { this.status = status; }
+    public void setBookingDate(LocalDateTime bookingDate) { this.bookingDate = bookingDate; }
+    public void setTotalPrice(double totalPrice) { this.totalPrice = totalPrice; }
 
     @Override
     public String toString() {

@@ -18,11 +18,15 @@ public class Traveler {
 
     public String getFullName() { return firstName + " " + lastName; }
     public int getId() { return this.id; }
+    public String getFirstName() { return this.firstName; }
+    public String getLastName() { return this.lastName; }
     public String getEmail() { return this.email; }
+    public String getPhoneNumber() { return this.phoneNumber; }
+
+    public void setId(int id) { this.id = id; }
 
     @Override
     public String toString() {
         return id + " | " + getFullName() + " | " + email;
     }
-
 }

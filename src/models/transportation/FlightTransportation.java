@@ -25,6 +25,9 @@ public class FlightTransportation extends Transportation {
         public FlightTransportation build() { return new FlightTransportation(this); }
     }
 
+    public String getFlightNumber() { return this.flightNumber; }
+    public String getAirlineClass() { return this.airlineClass; }
+
     @Override
     public String getTransportationType() { return "Flight"; }
 

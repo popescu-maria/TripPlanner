@@ -1,7 +1,6 @@
 package models.transportation;
 
 import interfaces.Bookable;
-import models.Traveler;
 
 public abstract class Transportation implements Bookable {
     private static int counter = 0;
@@ -58,6 +57,13 @@ public abstract class Transportation implements Bookable {
     public abstract String getTransportationType();
 
     public int getId() { return this.id; }
+    public String getProvider() { return this.provider; }
+    public String getOrigin() { return this.origin; }
+    public String getDestination() { return this.destination; }
+    public String getDepartureTime() { return this.departureTime; }
+    public String getArrivalTime() { return this.arrivalTime; }
+    public void setId(int id) { this.id = id; }
+    public void setAvailable(boolean available) { this.available = available; }
 
     @Override
     public void book() throws Exception {

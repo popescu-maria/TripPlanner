@@ -25,11 +25,14 @@ public class TrainTransportation extends Transportation {
         public TrainTransportation build() { return new TrainTransportation(this); }
     }
 
+    public String getTrainNumber() { return this.trainNumber; }
+    public int getWagonNumber() { return this.wagonNumber; }
+
     @Override
     public String getTransportationType() { return "Train"; }
 
     @Override
     public String toString() {
         return super.toString() + " | Train: " + trainNumber + " | Wagon number: " + wagonNumber;
-     }
+    }
 }

@@ -38,6 +38,12 @@ public class Activity implements Bookable {
     }
 
     public int getId() { return this.id; }
+    public String getName() { return this.name; }
+    public Destination getDestination() { return this.destination; }
+    public int getMaxParticipants() { return this.maxParticipants; }
+    public int getCurrentParticipants() { return this.currentParticipants; }
+    public void setId(int id) { this.id = id; }
+    public void setCurrentParticipants(int currentParticipants) { this.currentParticipants = currentParticipants; }
 
     @Override
     public void book() throws Exception {

@@ -63,6 +63,7 @@ public class Trip implements Comparable<Trip> {
     }
 
     public int getId() { return this.id; }
+    public void setId(int id) { this.id = id; }
     public String getName() { return this.name; }
     public LocalDate getStartDate() { return this.startDate; }
     public LocalDate getEndDate() { return this.endDate; }
