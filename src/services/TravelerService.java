@@ -31,7 +31,10 @@ public class TravelerService {
         return travelerDAO.findAll();
     }
 
-    public void deleteTraveler(int id) {
+    public void deleteTraveler(int id, int currentTravelerId) {
+        if (id == currentTravelerId) {
+            throw new IllegalStateException("You cannot delete the traveler you are logged in as.");
+        }
         travelerDAO.delete(id);
         audit.log("DELETE_TRAVELER");
     }

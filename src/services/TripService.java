@@ -2,6 +2,7 @@ package services;
 
 import audit.AuditService;
 import dao.TripDAO;
+import exceptions.InvalidTripException;
 import exceptions.TripNotFoundException;
 import models.Traveler;
 import models.Trip;
@@ -24,6 +25,10 @@ public class TripService {
     }
 
     public Trip createTrip(Trip trip) {
+        if (trip.getStartDate() != null && trip.getEndDate() != null
+                && trip.getEndDate().isBefore(trip.getStartDate())) {
+            throw new InvalidTripException("End date cannot be before start date.");
+        }
         Trip saved = tripDAO.save(trip);
         audit.log("CREATE_TRIP");
         return saved;

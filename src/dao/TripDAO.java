@@ -105,6 +105,18 @@ public class TripDAO implements GenericDAO<Trip> {
         }
     }
 
+    private void linkDestination(int tripId, int destinationId) {
+        String sql = "INSERT INTO trip_destination (trip_id, destination_id) VALUES (?, ?) " +
+                "ON CONFLICT DO NOTHING";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, tripId);
+            ps.setInt(2, destinationId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to link destination: " + e.getMessage());
+        }
+    }
+
     @Override
     public Trip save(Trip trip) {
         if (trip.getBudget() != null && trip.getBudget().getId() == 0) {
@@ -226,18 +238,6 @@ public class TripDAO implements GenericDAO<Trip> {
             return result;
         } catch (SQLException e) {
             throw new DataAccessException("Failed to find trips by traveler: " + e.getMessage());
-        }
-    }
-
-    public void linkDestination(int tripId, int destinationId) {
-        String sql = "INSERT INTO trip_destination (trip_id, destination_id) VALUES (?, ?) " +
-                "ON CONFLICT DO NOTHING";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, tripId);
-            ps.setInt(2, destinationId);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new DataAccessException("Failed to link destination: " + e.getMessage());
         }
     }
 

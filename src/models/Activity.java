@@ -64,6 +64,6 @@ public class Activity implements Bookable {
 
     @Override
     public String toString() {
-        return name + " | " + destination + " | $" + price + " | " + currentParticipants + "/" + maxParticipants + " participants";
+        return name + " | " + destination + " | " + price + " lei | " + currentParticipants + "/" + maxParticipants + " participants";
     }
 }

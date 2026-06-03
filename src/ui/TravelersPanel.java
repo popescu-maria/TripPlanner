@@ -60,11 +60,11 @@ public class TravelersPanel extends VBox {
             Traveler sel = list.getSelectionModel().getSelectedItem();
             if (sel == null) { status.setText("Select a traveler to delete."); return; }
             try {
-                travelerService.deleteTraveler(sel.getId());
+                travelerService.deleteTraveler(sel.getId(), TripPlannerApp.currentTraveler.getId());
                 status.setText("Deleted.");
                 refresh();
             } catch (Exception ex) {
-                status.setText("Error: " + ex.getMessage());
+                status.setText(ex.getMessage());
             }
         });
 

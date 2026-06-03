@@ -233,7 +233,14 @@ public class BookingsPanel extends VBox {
     }
 
     private void refresh() {
-        try { items.setAll(bookingService.getAllBookings()); }
-        catch (Exception ex) { status.setText("Could not load bookings: " + ex.getMessage()); }
+        try {
+            java.util.List<Booking> mine = new java.util.ArrayList<>();
+            for (Trip t : myTrips()) {
+                mine.addAll(bookingService.getBookingsForTrip(t));
+            }
+            items.setAll(mine);
+        } catch (Exception ex) {
+            status.setText("Could not load bookings: " + ex.getMessage());
+        }
     }
 }

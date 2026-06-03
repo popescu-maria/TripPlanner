@@ -21,7 +21,7 @@ public class TransportationDAO implements GenericDAO<Transportation> {
     private final Connection connection = DatabaseConnection.getInstance().getConnection();
 
     private Transportation mapRow(ResultSet rs) throws SQLException {
-        return TransportationFactory.fromResultSet(rs);   // factory does the work
+        return TransportationFactory.fromResultSet(rs);
     }
 
     @Override

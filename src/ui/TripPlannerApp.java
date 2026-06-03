@@ -139,6 +139,7 @@ public class TripPlannerApp extends Application {
         show(new TripsPanel());
 
         Scene scene = new Scene(root, 720, 640);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         stage.setTitle("Trip Planner");
         stage.setScene(scene);
         stage.show();
