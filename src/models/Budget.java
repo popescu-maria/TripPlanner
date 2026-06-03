@@ -14,7 +14,6 @@ public class Budget {
 
     public void addExpense(double amount) { this.spentAmount += amount; }
     public double getRemainingBudget() { return totalBudget - spentAmount; }
-    public boolean isOverBudget() { return spentAmount > totalBudget; }
 
     public int getId() { return this.id; }
     public double getTotalBudget() { return this.totalBudget; }

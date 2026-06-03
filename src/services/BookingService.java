@@ -63,6 +63,15 @@ public class BookingService {
         if (!bookable.isAvailable()) {
             throw new BookingException("The item you are trying to book is not available.");
         }
+
+        if (trip.getBudget() != null) {
+            double projected = trip.getBudget().getSpentAmount() + bookable.getPrice();
+            if (projected > trip.getBudget().getTotalBudget()) {
+                throw new BookingException("This booking exceeds the remaining budget. Remaining: "
+                        + trip.getBudget().getRemainingBudget() + " lei, item costs: " + bookable.getPrice() + " lei.");
+            }
+        }
+
         try {
             bookable.book();
         } catch (Exception e) {
@@ -71,13 +80,13 @@ public class BookingService {
 
         Booking booking = new Booking(trip, bookable);
         booking.confirm();
-        bookingDAO.save(booking);            // persist the booking
-        persistBookableState(bookable);      // persist availability/participants change
-        linkBookableToTrip(trip, bookable);  // set the item's trip_id so it shows in the trip
+        bookingDAO.save(booking);
+        persistBookableState(bookable);
+        linkBookableToTrip(trip, bookable);
 
         if (trip.getBudget() != null) {
             trip.getBudget().addExpense(bookable.getPrice());
-            budgetDAO.update(trip.getBudget());   // persist budget change
+            budgetDAO.update(trip.getBudget());
         }
 
         bookings.put(booking.getBookingId(), booking);
